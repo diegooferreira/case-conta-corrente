@@ -39,6 +39,7 @@ namespace ContaCorrente.Business.Models.Contas.Service
             var conta = await _contaRepository.GetById(contaId);
             conta.Saldo += valor;
             await _contaRepository.Update(conta);
+            await _contaRepository.SaveChanges();
         }
 
         public void Dispose()

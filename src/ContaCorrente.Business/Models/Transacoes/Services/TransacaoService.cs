@@ -1,4 +1,5 @@
-﻿using ContaCorrente.Business.Core.Errors;
+﻿using ContaCorrente.Business.Core.Data;
+using ContaCorrente.Business.Core.Errors;
 using ContaCorrente.Business.Core.Services;
 using ContaCorrente.Business.Models.Contas;
 using ContaCorrente.Business.Models.Contas.Service;
@@ -16,13 +17,16 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
     {
         private readonly IContaService _contaService;
         private readonly ITransacaoRepository _transacaoRepository;
+        private readonly ITransactionalScope _transactionalScope;
 
         public TransacaoService(ITransacaoRepository transacaoRepository,
             IContaService contaService,
+            ITransactionalScope transactionalScope,
             INotificator notificator) : base(notificator)
         {
             _transacaoRepository = transacaoRepository;
             _contaService = contaService;
+            _transactionalScope = transactionalScope;
         }
 
         public async Task Adicionar(Transacao transacao)
@@ -41,12 +45,26 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
                 return;
             }
 
-            // Registra a transação
-            await _transacaoRepository.Insert(transacao);
+            await _transactionalScope.Open();
 
-            // Atualiza o saldo
-            await _contaService.AtualizarSaldo(transacao.Conta.Id,
-                transacao.Valor * (transacao.Tipo == Enums.TipoTransacao.Debito ? -1 : 1));
+            try
+            {
+                // Registra a transação
+                await _transacaoRepository.Insert(transacao);
+                await _transacaoRepository.SaveChanges();
+
+                // Atualiza o saldo
+                await _contaService.AtualizarSaldo(transacao.Conta.Id,
+                    transacao.Valor * (transacao.Tipo == Enums.TipoTransacao.Debito ? -1 : 1));
+
+                await _transactionalScope.Complete();
+            }
+            catch (Exception ex)
+            {
+                await _transactionalScope.RevertChanges();
+
+                await NotifyError(ex.Message);
+            }
         }
 
         public async Task<IEnumerable<Transacao>> ObterTransacoesDaConta(Guid contaId)
@@ -58,6 +76,8 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
         public void Dispose()
         {
             _transacaoRepository?.Dispose();
+            _transactionalScope?.Dispose();
+            _contaService?.Dispose();
         }
     }
 }

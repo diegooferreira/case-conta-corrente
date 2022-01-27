@@ -1,4 +1,5 @@
 ﻿using ContaCorrente.Business.Core.Models;
+using ContaCorrente.Business.Models.Contas;
 
 namespace ContaCorrente.Business.Models.Clientes
 {
