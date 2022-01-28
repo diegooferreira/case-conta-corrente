@@ -18,6 +18,10 @@ namespace ContaCorrente.Infra.EF.Data.Mappings
             entity.HasKey(c => c.Id);
             entity.Property(c => c.Nome).IsRequired().HasMaxLength(100);
             entity.Property(c => c.Documento).IsRequired().HasMaxLength(14);
+            entity.HasData(new Cliente[] {
+                new Cliente(Guid.Parse("BC948E10-BFED-4F7A-B26A-ACFE6E2D51B1"), "Cliente 1", "99999999999"),
+                new Cliente(Guid.Parse("F486016F-9D68-4BD1-977C-1E0990707806"), "Cliente 2", "11111111111")
+            });
         }
     }
 }

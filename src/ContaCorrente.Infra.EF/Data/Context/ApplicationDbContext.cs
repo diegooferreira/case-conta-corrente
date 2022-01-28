@@ -22,7 +22,7 @@ namespace ContaCorrente.Infra.EF.Data.Context
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer($"Server=localhost, 1433;Initial Catalog=CcDb;User ID=sa;Password=xp123!@#");
+                optionsBuilder.UseSqlServer($"Server=localhost, 1433;Initial Catalog=BancoDb;User ID=sa;Password=xp123!@#");
             }
         }
 
@@ -51,8 +51,6 @@ namespace ContaCorrente.Infra.EF.Data.Context
             {
                 property.SetColumnType("varchar");
             }
-
-            //modelBuilder.RemovePluralizingTableNameConvention();
 
             modelBuilder.AddConfiguration(new ClienteConfig());
             modelBuilder.AddConfiguration(new ContaConfig());

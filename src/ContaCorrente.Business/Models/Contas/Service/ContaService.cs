@@ -3,6 +3,7 @@ using ContaCorrente.Business.Core.Services;
 using ContaCorrente.Business.Models.Contas.Repository;
 using ContaCorrente.Business.Models.Transacoes;
 using ContaCorrente.Business.Models.Transacoes.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,10 @@ namespace ContaCorrente.Business.Models.Contas.Service
         private readonly IContaRepository _contaRepository;
 
         public ContaService(INotificator notificator,
-            ITransacaoService transacaoService,
-            IContaRepository contaRepository) : base(notificator)
+            IContaRepository contaRepository,
+            IServiceProvider services) : base(notificator)
         {
-            _transacaoService = transacaoService;
+            //_transacaoService = services.GetRequiredService<ITransacaoService>();
             _contaRepository = contaRepository;
         }
 
@@ -39,7 +40,6 @@ namespace ContaCorrente.Business.Models.Contas.Service
             var conta = await _contaRepository.GetById(contaId);
             conta.Saldo += valor;
             await _contaRepository.Update(conta);
-            await _contaRepository.SaveChanges();
         }
 
         public void Dispose()

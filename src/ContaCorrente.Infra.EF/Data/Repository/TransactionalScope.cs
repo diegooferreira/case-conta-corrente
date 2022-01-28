@@ -15,7 +15,7 @@ namespace ContaCorrente.Infra.EF.Data.Repository
 
         private IDbContextTransaction Transaction { get; set; }
 
-        protected TransactionalScope(ApplicationDbContext db)
+        public TransactionalScope(ApplicationDbContext db)
         {
             Db = db;
         }

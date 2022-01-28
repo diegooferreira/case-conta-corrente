@@ -38,12 +38,12 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
                 return;
             }
 
-            var isContaValid = await IsModelValid<ContaValidation, Conta>(transacao.Conta);
+            //var isContaValid = await IsModelValid<ContaValidation, Conta>(transacao.Conta);
 
-            if (!isContaValid)
-            {
-                return;
-            }
+            //if (!isContaValid)
+            //{
+            //    return;
+            //}
 
             await _transactionalScope.Open();
 
@@ -51,10 +51,9 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
             {
                 // Registra a transação
                 await _transacaoRepository.Insert(transacao);
-                await _transacaoRepository.SaveChanges();
 
                 // Atualiza o saldo
-                await _contaService.AtualizarSaldo(transacao.Conta.Id,
+                await _contaService.AtualizarSaldo(transacao.ContaId,
                     transacao.Valor * (transacao.Tipo == Enums.TipoTransacao.Debito ? -1 : 1));
 
                 await _transactionalScope.Complete();
@@ -69,7 +68,7 @@ namespace ContaCorrente.Business.Models.Transacoes.Services
 
         public async Task<IEnumerable<Transacao>> ObterTransacoesDaConta(Guid contaId)
         {
-            var result = await _transacaoRepository.Search(t => t.Conta.Id == contaId);
+            var result = await _transacaoRepository.Search(t => t.ContaId == contaId);
             return result.OrderByDescending(o => o.Data);
         }
 

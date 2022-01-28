@@ -22,11 +22,13 @@ namespace ContaCorrente.Infra.EF.DependencyInjection
     {
         public static void RegisterBindins(IServiceCollection services, string connectionString)
         {
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
             services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<IContaRepository, ContaRepository>();
             services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<ITransactionalScope, TransactionalScope>();
         }
 
         public static void InitMigrations(IApplicationBuilder app)
